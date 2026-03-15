@@ -295,7 +295,7 @@ export default function MarketPulseApp() {
 
         {/* Header */}
         <header className="absolute top-0 inset-x-0 z-[100] px-6 pt-12 pb-4 bg-black/15 backdrop-blur-[40px] border-b border-white/[0.03]">
-          <div className="flex items-center justify-center gap-8 px-2 py-2">
+          <div className="flex items-center justify-center gap-6 px-4 py-3 bg-black/40 backdrop-blur-[32px] border-t border-white/[0.04] rounded-t-2xl shadow-[0_-4px_32px_rgba(0,0,0,0.18)]">
             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setIsMenuOpen(true)}>
               <img src={APP_ASSETS.headerLogo} alt="Logo" className="w-10 h-10 object-contain group-hover:scale-105 transition-transform" />
               <div className="flex flex-col justify-center h-10">
@@ -1058,7 +1058,7 @@ export default function MarketPulseApp() {
                       <div key={uc.id} className="mp-glass-card rounded-2xl p-4">
                         <div className="flex justify-between items-start mb-2">
                           <div className="flex items-center gap-2">
-                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${uc.sentiment === "Positive" ? "bg-[var(--mp-green)] text-background" : uc.sentiment === "Negative" ? "bg-[#FF3131] text-foreground" : "bg-white text-black"}`}>{uc.sentiment}</span>
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${uc.sentiment === "Positive" ? "bg-gradient-to-r from-[var(--mp-cyan)] to-[var(--mp-green)] text-background" : uc.sentiment === "Negative" ? "bg-gradient-to-r from-[#FF3131] to-[#FF8A8A] text-foreground" : "bg-white text-black"}`}>{uc.sentiment}</span>
                             <span className="text-[10px] text-white/30">{uc.timeframe}</span>
                           </div>
                           <button onClick={() => deleteComment(uc.id)} className="p-1 hover:bg-white/10 rounded-lg"><Trash2 className="w-3.5 h-3.5 text-[var(--mp-text-secondary)]" /></button>
@@ -1292,7 +1292,7 @@ export default function MarketPulseApp() {
                     className="absolute -bottom-1"
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
                   >
-                    <svg width="8" height="8">
+                    <svg width="10" height="10">
                       <defs>
                         <linearGradient id="navDotAnim" x1="0%" y1="0%" x2="100%" y2="100%">
                           <stop offset="0%" stopColor="#00FFFF">
@@ -1303,11 +1303,11 @@ export default function MarketPulseApp() {
                           </stop>
                         </linearGradient>
                       </defs>
-                      <circle cx="4" cy="4" r="4" fill="url(#navDotAnim)" />
+                      <circle cx="5" cy="5" r="5" fill="url(#navDotAnim)" />
                     </svg>
-                    <div className="absolute inset-0 blur-[4px]">
-                      <svg width="8" height="8">
-                        <circle cx="4" cy="4" r="4" fill="url(#navDotAnim)" />
+                    <div className="absolute inset-0 blur-[6px]">
+                      <svg width="10" height="10">
+                        <circle cx="5" cy="5" r="5" fill="url(#navDotAnim)" />
                       </svg>
                     </div>
                   </motion.div>
