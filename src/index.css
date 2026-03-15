@@ -109,7 +109,7 @@
   }
 
   .mp-gradient-badge {
-    background: linear-gradient(90deg, var(--mp-green) 0%, var(--mp-blue) 100%);
+    background: linear-gradient(to right, var(--mp-cyan), var(--mp-green));
   }
 
   .mp-gradient-badge-purple {
@@ -117,12 +117,12 @@
   }
 
   .mp-positive-badge {
-    background: linear-gradient(90deg, var(--mp-green) 0%, var(--mp-blue) 100%);
+    background: linear-gradient(to right, var(--mp-cyan), var(--mp-green));
     color: black;
   }
 
   .mp-negative-badge {
-    background: linear-gradient(90deg, #FF8A8A 0%, #E50000 100%);
+    background: var(--mp-red);
     color: black;
   }
 }
