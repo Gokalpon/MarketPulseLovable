@@ -80,3 +80,12 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/c
  - **To disable remote LLM in production:** Leave `VITE_ENABLE_LLM` unset or set it to `false` in your environment.
 
 Files added: `.env.sample` (root) — copy into `.env` or configure your deployment environment variables accordingly.
+
+## Recent UI changes (implemented)
+
+- **User comment markers:** User's own comments are now rendered as solid purple markers on charts for clear identification. (See `src/components/market/MarketPulseApp.tsx`)
+- **Donut sentiment gauge:** Positive and negative segments now use smooth gradients for a premium look; neutral segment uses a clean white stroke for readability. (See `src/components/market/MarketPulseApp.tsx`)
+- **Bottom navigation:** Button spacing and proportions improved (`flex-1`), and the active nav dot cycles between green, blue and white for better visual signature. (See `src/components/market/MarketPulseApp.tsx`)
+- **Color tokens & badges:** Positive badges use the green→blue signature gradient, negative badges now use a subtle red gradient, and neutral badges in comment lists use white for contrast. (See `src/index.css` and `src/components/market/MarketPulseApp.tsx`)
+
+These changes were implemented to match the visual guidance provided and improve clarity and premium feel.
