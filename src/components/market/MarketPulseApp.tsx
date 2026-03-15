@@ -13,7 +13,6 @@ import { NotifToggle } from "@/components/market/NotifToggle";
 import { SplashScreen } from "@/components/market/SplashScreen";
 import { OnboardingScreen } from "@/components/market/OnboardingScreen";
 import { useMarketData } from "@/hooks/useMarketData";
-import { analyzeAssetSummary } from "@/lib/llmClient";
 
 export default function MarketPulseApp() {
   const [showSplash, setShowSplash] = useState(true);
@@ -144,10 +143,6 @@ export default function MarketPulseApp() {
   const activeUserComments = useMemo(() => userComments.filter((c) => c.assetId === selectedAssetId && c.timeframe === timeframe), [userComments, selectedAssetId, timeframe]);
   const allAssetUserComments = useMemo(() => userComments.filter((c) => c.assetId === selectedAssetId), [userComments, selectedAssetId]);
 
-  // Chart math (must be before sentimentClusters)
-  const minVal = Math.min(...activeData) * 0.995;
-  const maxVal = Math.max(...activeData) * 1.005;
-
   // Sentiment clustering — group nearby price comments into max 5 clusters
   const sentimentClusters = useMemo(() => {
     if (activeUserComments.length === 0) return [];
@@ -200,6 +195,9 @@ export default function MarketPulseApp() {
     return clusters.sort((a, b) => b.count - a.count).slice(0, 5);
   }, [activeUserComments, minVal, maxVal]);
 
+  // Chart math
+  const minVal = Math.min(...activeData) * 0.995;
+  const maxVal = Math.max(...activeData) * 1.005;
   const range = maxVal - minVal;
   const getX = (i: number) => 4 + (i / (activeData.length - 1)) * 92;
   const getY = (v: number) => 8 + (100 - ((v - minVal) / range) * 100) * 0.84;
@@ -268,16 +266,14 @@ export default function MarketPulseApp() {
 
   const generateAIAnalysis = async () => {
     setIsAnalyzing(true);
-    try {
-      // Use a small subset of recent comments to keep token usage minimal
-      const recentComments = activeUserComments.slice(-8);
-      const summary = await analyzeAssetSummary({ id: activeAsset.id, name: activeAsset.name, price: activeAsset.price, change: activeAsset.change }, recentComments, { maxTokens: 140 });
-      setAiAnalysis(summary);
-    } catch (err) {
-      setAiAnalysis(`${activeAsset.name} is currently trading at $${activeAsset.price.toLocaleString()} with a ${activeAsset.change} change.`);
-    } finally {
+    setTimeout(() => {
+      setAiAnalysis(
+        `${activeAsset.name} is currently trading at $${activeAsset.price.toLocaleString()} with a ${activeAsset.change} change. ` +
+        `Market sentiment appears ${activeAsset.isUp ? "bullish" : "bearish"} in the short term. ` +
+        `Key support and resistance levels should be monitored for potential breakout or breakdown scenarios.`
+      );
       setIsAnalyzing(false);
-    }
+    }, 1500);
   };
 
   // Splash
@@ -505,12 +501,12 @@ export default function MarketPulseApp() {
                           const xPct = getX(safeIdx);
                           const yPct = getY(activeData[safeIdx] || cluster.avgPrice);
                           const sentColor = cluster.sentiment === "Positive" ? "from-[#39FF14] to-[#00FFFF]" : cluster.sentiment === "Negative" ? "from-[#FF3131] to-[#FF6B6B]" : "from-[#B24BF3] to-[#5B7FFF]";
-                          const glowShadow = cluster.sentiment === "Positive" ? "0 0 12px rgba(57,255,20,0.5)" : cluster.sentiment === "Negative" ? "0 0 12px rgba(255,49,49,0.5)" : "0 0 12px rgba(178,75,243,0.5)";
+                          const glowColor = cluster.sentiment === "Positive" ? "rgba(57,255,20,0.5)" : cluster.sentiment === "Negative" ? "rgba(255,49,49,0.5)" : "rgba(178,75,243,0.5)";
                           const size = cluster.count >= 5 ? "w-5 h-5" : cluster.count >= 2 ? "w-4 h-4" : "w-3.5 h-3.5";
                           return (
                             <div key={`cluster-${ci}`} className="absolute z-25" style={{ left: `${xPct}%`, top: `${yPct}%`, transform: "translate(-50%, -50%)" }}>
                               <div className="p-3 -m-3 cursor-pointer" onClick={(e) => { e.stopPropagation(); setShowMyComments(true); }}>
-                                <div className={`${size} rounded-full bg-gradient-to-br ${sentColor} flex items-center justify-center`} style={{ boxShadow: glowShadow }}>
+                                <div className={`${size} rounded-full bg-gradient-to-br ${sentColor} shadow-[0_0_12px_${glowColor}] flex items-center justify-center`}>
                                   {cluster.count > 1 && <span className="text-[7px] font-black text-black">{cluster.count}</span>}
                                 </div>
                               </div>

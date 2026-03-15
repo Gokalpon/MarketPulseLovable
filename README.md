@@ -71,12 +71,3 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
-
-## LLM / AI integration (safe defaults)
-
- - **Default state:** Remote LLM calls are disabled by default for safety and cost control.
- - **Config:** See `.env.sample` for recommended environment variables and safe defaults.
- - **How it works:** The app uses a local summarizer and persistent cache when the LLM is not enabled. Remote LLM requests are only made when an explicit endpoint is configured and defined gating thresholds are exceeded (price movement or comment activity).
- - **To disable remote LLM in production:** Leave `VITE_ENABLE_LLM` unset or set it to `false` in your environment.
-
-Files added: `.env.sample` (root) — copy into `.env` or configure your deployment environment variables accordingly.
