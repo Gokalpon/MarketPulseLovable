@@ -13,6 +13,7 @@ import { NotifToggle } from "@/components/market/NotifToggle";
 import { SplashScreen } from "@/components/market/SplashScreen";
 import { OnboardingScreen } from "@/components/market/OnboardingScreen";
 import { useMarketData } from "@/hooks/useMarketData";
+import { analyzeAssetSummary } from "@/lib/llmClient";
 
 export default function MarketPulseApp() {
   const [showSplash, setShowSplash] = useState(true);
@@ -267,14 +268,16 @@ export default function MarketPulseApp() {
 
   const generateAIAnalysis = async () => {
     setIsAnalyzing(true);
-    setTimeout(() => {
-      setAiAnalysis(
-        `${activeAsset.name} is currently trading at $${activeAsset.price.toLocaleString()} with a ${activeAsset.change} change. ` +
-        `Market sentiment appears ${activeAsset.isUp ? "bullish" : "bearish"} in the short term. ` +
-        `Key support and resistance levels should be monitored for potential breakout or breakdown scenarios.`
-      );
+    try {
+      // Use a small subset of recent comments to keep token usage minimal
+      const recentComments = activeUserComments.slice(-8);
+      const summary = await analyzeAssetSummary({ id: activeAsset.id, name: activeAsset.name, price: activeAsset.price, change: activeAsset.change }, recentComments, { maxTokens: 140 });
+      setAiAnalysis(summary);
+    } catch (err) {
+      setAiAnalysis(`${activeAsset.name} is currently trading at $${activeAsset.price.toLocaleString()} with a ${activeAsset.change} change.`);
+    } finally {
       setIsAnalyzing(false);
-    }, 1500);
+    }
   };
 
   // Splash
