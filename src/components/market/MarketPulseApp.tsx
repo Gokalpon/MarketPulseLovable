@@ -501,12 +501,12 @@ export default function MarketPulseApp() {
                           const xPct = getX(safeIdx);
                           const yPct = getY(activeData[safeIdx] || cluster.avgPrice);
                           const sentColor = cluster.sentiment === "Positive" ? "from-[#39FF14] to-[#00FFFF]" : cluster.sentiment === "Negative" ? "from-[#FF3131] to-[#FF6B6B]" : "from-[#B24BF3] to-[#5B7FFF]";
-                          const glowColor = cluster.sentiment === "Positive" ? "rgba(57,255,20,0.5)" : cluster.sentiment === "Negative" ? "rgba(255,49,49,0.5)" : "rgba(178,75,243,0.5)";
+                          const glowShadow = cluster.sentiment === "Positive" ? "0 0 12px rgba(57,255,20,0.5)" : cluster.sentiment === "Negative" ? "0 0 12px rgba(255,49,49,0.5)" : "0 0 12px rgba(178,75,243,0.5)";
                           const size = cluster.count >= 5 ? "w-5 h-5" : cluster.count >= 2 ? "w-4 h-4" : "w-3.5 h-3.5";
                           return (
                             <div key={`cluster-${ci}`} className="absolute z-25" style={{ left: `${xPct}%`, top: `${yPct}%`, transform: "translate(-50%, -50%)" }}>
                               <div className="p-3 -m-3 cursor-pointer" onClick={(e) => { e.stopPropagation(); setShowMyComments(true); }}>
-                                <div className={`${size} rounded-full bg-gradient-to-br ${sentColor} shadow-[0_0_12px_${glowColor}] flex items-center justify-center`}>
+                                <div className={`${size} rounded-full bg-gradient-to-br ${sentColor} flex items-center justify-center`} style={{ boxShadow: glowShadow }}>
                                   {cluster.count > 1 && <span className="text-[7px] font-black text-black">{cluster.count}</span>}
                                 </div>
                               </div>
