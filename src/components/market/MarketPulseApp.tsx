@@ -295,7 +295,7 @@ export default function MarketPulseApp() {
 
         {/* Header */}
         <header className="absolute top-0 inset-x-0 z-[100] px-6 pt-12 pb-4 bg-black/15 backdrop-blur-[40px] border-b border-white/[0.03]">
-          <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center justify-center gap-8 px-2 py-2">
             <div className="flex items-center gap-3 cursor-pointer group" onClick={() => setIsMenuOpen(true)}>
               <img src={APP_ASSETS.headerLogo} alt="Logo" className="w-10 h-10 object-contain group-hover:scale-105 transition-transform" />
               <div className="flex flex-col justify-center h-10">
