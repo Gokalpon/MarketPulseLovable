@@ -143,6 +143,10 @@ export default function MarketPulseApp() {
   const activeUserComments = useMemo(() => userComments.filter((c) => c.assetId === selectedAssetId && c.timeframe === timeframe), [userComments, selectedAssetId, timeframe]);
   const allAssetUserComments = useMemo(() => userComments.filter((c) => c.assetId === selectedAssetId), [userComments, selectedAssetId]);
 
+  // Chart math (must be before sentimentClusters)
+  const minVal = Math.min(...activeData) * 0.995;
+  const maxVal = Math.max(...activeData) * 1.005;
+
   // Sentiment clustering — group nearby price comments into max 5 clusters
   const sentimentClusters = useMemo(() => {
     if (activeUserComments.length === 0) return [];
@@ -195,9 +199,6 @@ export default function MarketPulseApp() {
     return clusters.sort((a, b) => b.count - a.count).slice(0, 5);
   }, [activeUserComments, minVal, maxVal]);
 
-  // Chart math
-  const minVal = Math.min(...activeData) * 0.995;
-  const maxVal = Math.max(...activeData) * 1.005;
   const range = maxVal - minVal;
   const getX = (i: number) => 4 + (i / (activeData.length - 1)) * 92;
   const getY = (v: number) => 8 + (100 - ((v - minVal) / range) * 100) * 0.84;
