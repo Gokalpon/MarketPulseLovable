@@ -13,7 +13,6 @@ import { NotifToggle } from "@/components/market/NotifToggle";
 import { SplashScreen } from "@/components/market/SplashScreen";
 import { OnboardingScreen } from "@/components/market/OnboardingScreen";
 import { useMarketData } from "@/hooks/useMarketData";
-import { analyzeAssetSummary } from "@/lib/llmClient";
 
 export default function MarketPulseApp() {
   const [showSplash, setShowSplash] = useState(true);
@@ -268,16 +267,14 @@ export default function MarketPulseApp() {
 
   const generateAIAnalysis = async () => {
     setIsAnalyzing(true);
-    try {
-      // Use a small subset of recent comments to keep token usage minimal
-      const recentComments = activeUserComments.slice(-8);
-      const summary = await analyzeAssetSummary({ id: activeAsset.id, name: activeAsset.name, price: activeAsset.price, change: activeAsset.change }, recentComments, { maxTokens: 140 });
-      setAiAnalysis(summary);
-    } catch (err) {
-      setAiAnalysis(`${activeAsset.name} is currently trading at $${activeAsset.price.toLocaleString()} with a ${activeAsset.change} change.`);
-    } finally {
+    setTimeout(() => {
+      setAiAnalysis(
+        `${activeAsset.name} is currently trading at $${activeAsset.price.toLocaleString()} with a ${activeAsset.change} change. ` +
+        `Market sentiment appears ${activeAsset.isUp ? "bullish" : "bearish"} in the short term. ` +
+        `Key support and resistance levels should be monitored for potential breakout or breakdown scenarios.`
+      );
       setIsAnalyzing(false);
-    }
+    }, 1500);
   };
 
   // Splash
@@ -500,7 +497,7 @@ export default function MarketPulseApp() {
                         })}
 
                         {/* Clustered user comment sentiment markers */}
-                          {sentimentClusters.map((cluster, ci) => {
+                        {sentimentClusters.map((cluster, ci) => {
                           const safeIdx = Math.max(0, Math.min(activeData.length - 1, cluster.avgIdx));
                           const xPct = getX(safeIdx);
                           const yPct = getY(activeData[safeIdx] || cluster.avgPrice);
@@ -514,18 +511,6 @@ export default function MarketPulseApp() {
                                   {cluster.count > 1 && <span className="text-[7px] font-black text-black">{cluster.count}</span>}
                                 </div>
                               </div>
-                            </div>
-                          );
-                          })}
-
-                        {/* User's own comments rendered as solid purple markers */}
-                        {allAssetUserComments.map((uc: any) => {
-                          const idx = Math.max(0, Math.min(activeData.length - 1, uc.chartIndex || 0));
-                          const x = getX(idx);
-                          const y = getY(uc.price || activeData[idx]);
-                          return (
-                            <div key={`user-${uc.id}`} className="absolute z-30" style={{ left: `${x}%`, top: `${y}%`, transform: "translate(-50%, -50%)" }}>
-                              <div className="w-3 h-3 rounded-full bg-[var(--mp-purple)] shadow-[0_0_8px_rgba(178,75,243,0.35)] border border-white/[0.06]" />
                             </div>
                           );
                         })}
@@ -1072,8 +1057,8 @@ export default function MarketPulseApp() {
                     {allAssetUserComments.map((uc: any) => (
                       <div key={uc.id} className="mp-glass-card rounded-2xl p-4">
                         <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center gap-2">
-                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${uc.sentiment === "Positive" ? "bg-[linear-gradient(90deg,var(--mp-green),var(--mp-blue))] text-background" : uc.sentiment === "Negative" ? "bg-gradient-to-r from-[#FF8A8A] to-[#E50000] text-foreground" : "bg-white text-black"}`}>{uc.sentiment}</span>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${uc.sentiment === "Positive" ? "bg-[var(--mp-green)] text-background" : uc.sentiment === "Negative" ? "bg-[#FF3131] text-foreground" : "bg-[var(--mp-cyan)] text-background"}`}>{uc.sentiment}</span>
                             <span className="text-[10px] text-white/30">{uc.timeframe}</span>
                           </div>
                           <button onClick={() => deleteComment(uc.id)} className="p-1 hover:bg-white/10 rounded-lg"><Trash2 className="w-3.5 h-3.5 text-[var(--mp-text-secondary)]" /></button>
@@ -1154,22 +1139,10 @@ export default function MarketPulseApp() {
                             {/* Circular gauge */}
                             <div className="relative w-20 h-20 flex-shrink-0">
                               <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-                                <defs>
-                                  <linearGradient id="posGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#39FF14" />
-                                    <stop offset="60%" stopColor="#00FFFF" />
-                                    <stop offset="100%" stopColor="#5B7FFF" />
-                                  </linearGradient>
-                                  <linearGradient id="negGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="#FF8A8A" />
-                                    <stop offset="60%" stopColor="#FF5A5A" />
-                                    <stop offset="100%" stopColor="#E50000" />
-                                  </linearGradient>
-                                </defs>
                                 <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="3" />
-                                <circle cx="18" cy="18" r="14" fill="none" stroke="url(#posGrad)" strokeWidth="3" strokeDasharray={`${posPct * 0.88} 88`} strokeDashoffset="0" strokeLinecap="round" />
-                                <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.85)" strokeWidth="3" strokeDasharray={`${neuPct * 0.88} 88`} strokeDashoffset={`${-posPct * 0.88}`} strokeLinecap="round" />
-                                <circle cx="18" cy="18" r="14" fill="none" stroke="url(#negGrad)" strokeWidth="3" strokeDasharray={`${negPct * 0.88} 88`} strokeDashoffset={`${-(posPct + neuPct) * 0.88}`} strokeLinecap="round" />
+                                <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-green)" strokeWidth="3" strokeDasharray={`${posPct * 0.88} 88`} strokeDashoffset="0" strokeLinecap="round" />
+                                <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-cyan)" strokeWidth="3" strokeDasharray={`${neuPct * 0.88} 88`} strokeDashoffset={`${-posPct * 0.88}`} strokeLinecap="round" />
+                                <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-red)" strokeWidth="3" strokeDasharray={`${negPct * 0.88} 88`} strokeDashoffset={`${-(posPct + neuPct) * 0.88}`} strokeLinecap="round" />
                               </svg>
                               <div className="absolute inset-0 flex items-center justify-center flex-col">
                                 <div className="text-[14px] font-black text-foreground leading-none">{total}</div>
@@ -1295,17 +1268,9 @@ export default function MarketPulseApp() {
         </AnimatePresence>
 
         {/* Bottom Navigation */}
-        <nav className="absolute bottom-0 inset-x-0 z-[100] bg-black/40 backdrop-blur-[40px] border-t border-white/[0.03] px-3 pt-2 pb-8">
-          <svg width="0" height="0" className="absolute">
-            <defs>
-              <linearGradient id="navDotGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#00FFFF"><animate attributeName="stop-color" values="#00FFFF;#39FF14;#FFFFFF;#00FFFF" dur="3s" repeatCount="indefinite" /></stop>
-                <stop offset="50%" stopColor="#39FF14"><animate attributeName="stop-color" values="#39FF14;#5B7FFF;#FFFFFF;#39FF14" dur="3s" repeatCount="indefinite" /></stop>
-                <stop offset="100%" stopColor="#FFFFFF"><animate attributeName="stop-color" values="#FFFFFF;#00FFFF;#39FF14;#FFFFFF" dur="3s" repeatCount="indefinite" /></stop>
-              </linearGradient>
-            </defs>
-          </svg>
-          <div className="flex items-center justify-between">
+        <nav className="absolute bottom-0 inset-x-0 z-[100] bg-black/40 backdrop-blur-[40px] border-t border-white/[0.03] px-4 pt-3 pb-8">
+          <svg width="0" height="0" className="absolute"><defs><linearGradient id="navDotGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#00FFFF"><animate attributeName="stop-color" values="#00FFFF;#39FF14;#00FFFF" dur="3s" repeatCount="indefinite" /></stop><stop offset="100%" stopColor="#39FF14"><animate attributeName="stop-color" values="#39FF14;#00FFFF;#39FF14" dur="3s" repeatCount="indefinite" /></stop></linearGradient></defs></svg>
+          <div className="flex items-center justify-around">
             {[
               { id: "dashboard", label: "Home", isLogo: true },
               { id: "watchlist", label: t.watchlist, icon: List },
@@ -1313,7 +1278,7 @@ export default function MarketPulseApp() {
               { id: "community", label: t.community, icon: Users },
               { id: "profile", label: "Profile", icon: Settings },
             ].map((tab) => (
-              <button key={tab.id} onClick={() => { setActiveTab(tab.id); setProfilePage(null); }} className="flex-1 flex flex-col items-center gap-1 relative py-2">
+              <button key={tab.id} onClick={() => { setActiveTab(tab.id); setProfilePage(null); }} className="flex flex-col items-center gap-1.5 relative py-1 w-14">
                 <div className={`transition-all duration-300 ${activeTab === tab.id ? "text-white scale-110" : "text-[#4A4B5D]"}`}>
                   {tab.isLogo ? (
                     <img src={APP_ASSETS.tabLogo} alt="" className={`w-6 h-6 object-contain transition-all duration-300 ${activeTab === tab.id ? "opacity-100 brightness-200" : "opacity-30 grayscale"}`} />
