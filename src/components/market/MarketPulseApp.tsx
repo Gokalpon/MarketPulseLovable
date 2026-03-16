@@ -481,15 +481,26 @@ export default function MarketPulseApp() {
                                 <div className={`rounded-full transition-all duration-300 flex items-center justify-center overflow-hidden ${
                                   isSelected
                                     ? `w-28 h-28 flex-shrink-0 ${isNews ? "mp-gradient-badge shadow-[0_10px_30px_rgba(0,255,255,0.4)]" : "bg-foreground shadow-[0_10px_30px_rgba(255,255,255,0.3)]"}`
-                                    : `w-3 h-3 flex-shrink-0 hover:scale-150 border border-white/20 ${isNews ? "bg-[var(--mp-cyan)] shadow-[0_0_10px_rgba(0,255,255,0.5)]" : "bg-[#B24BF3] shadow-[0_0_10px_rgba(178,75,243,0.5)]"}`
+                                    : `w-3 h-3 flex-shrink-0 hover:scale-150 border border-white/20 ${isNews ? "bg-[var(--mp-cyan)] shadow-[0_0_10px_rgba(0,255,255,0.5)]" : "bg-white shadow-[0_0_8px_rgba(255,255,255,0.4)]"}`
                                 }`}>
                                   {isSelected && (
                                     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="p-3 text-center flex flex-col items-center justify-center h-full w-full relative">
                                       <div className={`text-[9px] font-black uppercase tracking-wider mb-1 ${isNews ? "text-background opacity-70" : point.sentiment === "Positive" ? "text-[#00C805]" : point.sentiment === "Negative" ? "text-[var(--mp-red)]" : "text-[#0088FF]"}`}>
                                         {isNews ? t.newsAlert : point.sentiment}
                                       </div>
-                                      <div className={`text-[11px] font-bold leading-snug line-clamp-3 ${isNews ? "text-background" : "text-[#0A0C0E]"}`}>{point.translation}</div>
-                                      <div className={`absolute bottom-2 ${isNews ? "text-background/50" : "text-black/30"}`}><ChevronRight className="w-3 h-3 rotate-90" strokeWidth={3} /></div>
+                                      <div className={`text-[11px] font-bold leading-snug line-clamp-2 mb-1.5 ${isNews ? "text-background" : "text-[#0A0C0E]"}`}>{point.translation}</div>
+                                      
+                                      {isNews ? (
+                                        <button 
+                                          onClick={(e) => { e.stopPropagation(); window.open('https://www.reuters.com/business/finance', '_blank'); }}
+                                          className="bg-background/20 hover:bg-background/30 px-2 py-1 rounded flex items-center gap-1.5 transition-colors border border-background/20"
+                                        >
+                                          <ExternalLink className="w-2.5 h-2.5 text-background" />
+                                          <span className="text-[7px] font-black uppercase text-background tracking-wider">Source</span>
+                                        </button>
+                                      ) : (
+                                        <div className={`absolute bottom-2 ${isNews ? "text-background/50" : "text-black/30"}`}><ChevronRight className="w-3 h-3 rotate-90" strokeWidth={3} /></div>
+                                      )}
                                     </motion.div>
                                   )}
                                 </div>
@@ -503,8 +514,8 @@ export default function MarketPulseApp() {
                           const safeIdx = Math.max(0, Math.min(activeData.length - 1, cluster.avgIdx));
                           const xPct = getX(safeIdx);
                           const yPct = getY(activeData[safeIdx] || cluster.avgPrice);
-                          const sentColor = "from-[#B24BF3] to-[#8A2BE2]";
-                          const glowColor = "rgba(178,75,243,0.5)";
+                          const sentColor = "from-[#B24BF3] via-[#9D44D3] to-[#8A2BE2]";
+                          const glowColor = "rgba(178,75,243,0.4)";
                           const size = cluster.count >= 5 ? "w-5 h-5" : cluster.count >= 2 ? "w-4 h-4" : "w-3.5 h-3.5";
                           return (
                             <div key={`cluster-${ci}`} className="absolute z-25" style={{ left: `${xPct}%`, top: `${yPct}%`, transform: "translate(-50%, -50%)" }}>
@@ -1106,6 +1117,13 @@ export default function MarketPulseApp() {
                 {(() => {
                   const allComments = detailedPoint.comments || [];
                   const total = allComments.length;
+
+                  const pos = allComments.filter((c: any) => c.sentiment === "Positive").length;
+                  const neg = allComments.filter((c: any) => c.sentiment === "Negative").length;
+                  const neu = allComments.filter((c: any) => c.sentiment === "Neutral").length;
+                  const posPct = total > 0 ? Math.round((pos / total) * 100) : 0;
+                  const neuPct = total > 0 ? Math.round((neu / total) * 100) : 0;
+                  const negPct = total > 0 ? Math.round((neg / total) * 100) : 0;
                   
                   return (
                     <div className="mb-6">
@@ -1114,22 +1132,54 @@ export default function MarketPulseApp() {
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--mp-cyan)]">AI Sentiment Summary</span>
                       </div>
                       
-                      <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 mb-6">
-                        <p className="text-[15px] font-bold text-foreground text-center leading-relaxed">
+                      <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 mb-6">
+                        <p className="text-[14px] font-bold text-foreground text-center leading-relaxed italic opacity-90">
                           "{detailedPoint.translation || "Resistance level being tested."}"
                         </p>
                       </div>
-                      
-                      <div className="text-[13px] font-black text-foreground mb-4">{total} Comments</div>
 
-                      {/* Sentiment filter - match second image style */}
-                      <div className="flex gap-2 mb-6">
+                      {total >= 10 && (
+                        <div className="px-5 py-4 bg-white/[0.02] border border-white/[0.04] rounded-2xl mb-6">
+                          <div className="flex items-center gap-6">
+                            <div className="relative w-16 h-16 flex-shrink-0">
+                                <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                                  <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="3" />
+                                  <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-green)" strokeWidth="3" strokeDasharray={`${posPct * 0.88} 88`} strokeDashoffset="0" strokeLinecap="round" />
+                                  <circle cx="18" cy="18" r="14" fill="none" stroke="white" strokeWidth="3" strokeDasharray={`${neuPct * 0.88} 88`} strokeDashoffset={`${-posPct * 0.88}`} strokeLinecap="round" />
+                                  <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-red)" strokeWidth="3" strokeDasharray={`${negPct * 0.88} 88`} strokeDashoffset={`${-(posPct + neuPct) * 0.88}`} strokeLinecap="round" />
+                                </svg>
+                                <div className="absolute inset-0 flex items-center justify-center flex-col">
+                                  <div className="text-[12px] font-black text-foreground leading-none">{total}</div>
+                                  <div className="text-[5px] font-bold text-white/30 uppercase tracking-widest">votes</div>
+                                </div>
+                            </div>
+                            <div className="flex-1 space-y-1.5">
+                              {[
+                                { label: "Positive", pct: posPct, color: "var(--mp-green)" },
+                                { label: "Neutral", pct: neuPct, color: "white" },
+                                { label: "Negative", pct: negPct, color: "var(--mp-red)" },
+                              ].map(s => (
+                                <div key={s.label} className="flex items-center justify-between text-[10px]">
+                                  <span className="text-white/40 font-bold uppercase tracking-wider">{s.label}</span>
+                                  <span className="font-black" style={{ color: s.color }}>{s.pct}%</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="text-[12px] font-black text-foreground">{total} Comments</div>
+                      </div>
+
+                      <div className="flex gap-2 mb-6 overflow-x-auto scrollbar-hide">
                         {["All", "Positive", "Neutral", "Negative"].map((s) => (
                           <button 
                             key={s} 
                             onClick={() => setSentimentFilter(s)} 
-                            className={`px-4 py-2 rounded-xl text-[10px] font-bold transition-all ${
-                              sentimentFilter === s ? "bg-white text-black" : "bg-white/[0.05] text-white/40 hover:bg-white/10"
+                            className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border ${
+                              sentimentFilter === s ? "bg-white text-black border-white" : "bg-white/[0.03] text-white/40 border-white/10 hover:bg-white/10"
                             }`}
                           >
                             {s}
@@ -1159,54 +1209,52 @@ export default function MarketPulseApp() {
                     </div>
                   ))}
 
-                {/* Comments - match second image card style */}
-                <div className="space-y-4 mb-20">
+                {/* Comments list - Cleaned up and smaller */}
+                <div className="space-y-3 mb-24">
                   {(detailedPoint.comments || [])
                     .filter((c: any) => sentimentFilter === "All" || c.sentiment === sentimentFilter)
                     .slice(0, 30)
                     .map((comment: any, i: number) => {
-                      const key = `${detailedPoint.idx}-${i}`;
                       return (
-                        <div key={i} className="bg-white/[0.03] border border-white/[0.05] rounded-[24px] p-5">
-                          <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-sm font-black text-white/60">
+                        <div key={i} className="bg-white/[0.03] border border-white/[0.05] rounded-[20px] p-4">
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-black text-white/60">
                                 {comment.user[1].toUpperCase()}
                               </div>
                               <div className="flex flex-col">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-[14px] font-bold text-foreground">{comment.user}</span>
-                                  <Heart className="w-3.5 h-3.5 text-white/20" />
-                                  <span className="text-[11px] text-white/20 font-bold">{comment.likes || 0}</span>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="text-[12px] font-bold text-foreground/90">{comment.user}</span>
+                                  <span className="text-[9px] text-white/20 font-bold flex items-center gap-0.5"><Heart className="w-2.5 h-2.5" /> {comment.likes || 0}</span>
                                 </div>
                               </div>
                             </div>
-                            <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-[6px] ${
-                              comment.sentiment === "Positive" ? "bg-[var(--mp-green)] text-black" : 
-                              comment.sentiment === "Negative" ? "bg-[var(--mp-red)] text-white" : 
-                              "bg-white text-black"
+                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-[5px] ${
+                              comment.sentiment === "Positive" ? "bg-[var(--mp-green)]/10 text-[var(--mp-green)]" : 
+                              comment.sentiment === "Negative" ? "bg-[var(--mp-red)]/10 text-[var(--mp-red)]" : 
+                              "bg-white/10 text-white"
                             }`}>
                               {comment.sentiment}
                             </span>
                           </div>
                           
-                          <p className="text-[14px] text-white/80 leading-relaxed italic mb-3">
-                            "{comment.text}"
+                          <p className="text-[12px] text-white/60 leading-relaxed mb-3 pr-2">
+                            {comment.text}
                           </p>
                           
                           <div className="flex items-center justify-between pt-2 border-t border-white/[0.03]">
                             <div className="flex items-center gap-4">
-                              <button className="flex items-center gap-1.5 text-white/20 hover:text-white/40 transition-colors">
-                                <TrendingUp className="w-3.5 h-3.5" />
-                                <span className="text-[10px] font-bold">{comment.likes || 0}</span>
+                              <button className="flex items-center gap-1 text-white/20 hover:text-white/40 transition-colors">
+                                <TrendingUp className="w-3 h-3" />
+                                <span className="text-[9px] font-bold">{comment.likes || 0}</span>
                               </button>
-                              <button className="flex items-center gap-1.5 text-white/20 hover:text-white/40 transition-colors">
-                                <TrendingDown className="w-3.5 h-3.5" />
+                              <button className="flex items-center gap-1 text-white/20 hover:text-white/40 transition-colors">
+                                <TrendingDown className="w-3 h-3" />
                               </button>
                             </div>
-                            <div className="flex items-center gap-2">
-                              <Globe className="w-3.5 h-3.5 text-white/20" />
-                              <span className="text-[8px] font-black uppercase tracking-wider text-white/20">Translated to English</span>
+                            <div className="flex items-center gap-1.5 opacity-30">
+                              <Globe className="w-2.5 h-2.5" />
+                              <span className="text-[7px] font-black uppercase tracking-wider">Translated</span>
                             </div>
                           </div>
                         </div>
@@ -1226,7 +1274,6 @@ export default function MarketPulseApp() {
                       <Send className="w-4 h-4" />
                     </button>
                   </div>
-                </div>
                 </div>
                 </div>
               </motion.div>
