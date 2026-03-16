@@ -440,13 +440,6 @@ export default function MarketPulseApp() {
                     {/* Chart */}
                     <div className={`mt-8 relative w-full flex transition-all duration-500 ${chartExpanded ? "h-[400px]" : "h-[240px]"}`}>
                       <div className="flex-1 relative" onClick={handleChartTap}>
-                        {/* Expand/collapse toggle */}
-                        <button 
-                          onClick={(e) => { e.stopPropagation(); setChartExpanded(!chartExpanded); }}
-                          className="absolute top-0 right-0 z-50 w-7 h-7 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-colors"
-                        >
-                          <Activity className={`w-3.5 h-3.5 text-white/40 transition-transform ${chartExpanded ? "rotate-45" : ""}`} />
-                        </button>
                         <svg viewBox="0 0 100 100" className="absolute inset-0 w-full h-full overflow-visible" preserveAspectRatio="none">
                           <defs>
                             <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stopColor="#39FF14" /><stop offset="100%" stopColor="#00FFFF" /></linearGradient>
@@ -488,7 +481,7 @@ export default function MarketPulseApp() {
                                 <div className={`rounded-full transition-all duration-300 flex items-center justify-center overflow-hidden ${
                                   isSelected
                                     ? `w-28 h-28 flex-shrink-0 ${isNews ? "mp-gradient-badge shadow-[0_10px_30px_rgba(0,255,255,0.4)]" : "bg-foreground shadow-[0_10px_30px_rgba(255,255,255,0.3)]"}`
-                                    : `w-3 h-3 flex-shrink-0 hover:scale-150 border border-white/20 ${isNews ? "bg-[var(--mp-cyan)] shadow-[0_0_10px_rgba(0,255,255,0.5)]" : "bg-foreground shadow-[0_0_10px_rgba(255,255,255,0.3)]"}`
+                                    : `w-3 h-3 flex-shrink-0 hover:scale-150 border border-white/20 ${isNews ? "bg-[var(--mp-cyan)] shadow-[0_0_10px_rgba(0,255,255,0.5)]" : "bg-[#B24BF3] shadow-[0_0_10px_rgba(178,75,243,0.5)]"}`
                                 }`}>
                                   {isSelected && (
                                     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="p-3 text-center flex flex-col items-center justify-center h-full w-full relative">
@@ -510,8 +503,8 @@ export default function MarketPulseApp() {
                           const safeIdx = Math.max(0, Math.min(activeData.length - 1, cluster.avgIdx));
                           const xPct = getX(safeIdx);
                           const yPct = getY(activeData[safeIdx] || cluster.avgPrice);
-                          const sentColor = cluster.sentiment === "Positive" ? "from-[#39FF14] to-[#00FFFF]" : cluster.sentiment === "Negative" ? "from-[#FF3131] to-[#FF6B6B]" : "from-[#B24BF3] to-[#5B7FFF]";
-                          const glowColor = cluster.sentiment === "Positive" ? "rgba(57,255,20,0.5)" : cluster.sentiment === "Negative" ? "rgba(255,49,49,0.5)" : "rgba(178,75,243,0.5)";
+                          const sentColor = "from-[#B24BF3] to-[#8A2BE2]";
+                          const glowColor = "rgba(178,75,243,0.5)";
                           const size = cluster.count >= 5 ? "w-5 h-5" : cluster.count >= 2 ? "w-4 h-4" : "w-3.5 h-3.5";
                           return (
                             <div key={`cluster-${ci}`} className="absolute z-25" style={{ left: `${xPct}%`, top: `${yPct}%`, transform: "translate(-50%, -50%)" }}>
@@ -1109,94 +1102,45 @@ export default function MarketPulseApp() {
                   </div>
                 </div>
 
-                {/* Premium AI Sentiment Analysis */}
+                {/* Redesigned AI Sentiment Analysis */}
                 {(() => {
                   const allComments = detailedPoint.comments || [];
-                  if (allComments.length >= 10) {
-                    const pos = allComments.filter((c: any) => c.sentiment === "Positive").length;
-                    const neg = allComments.filter((c: any) => c.sentiment === "Negative").length;
-                    const neu = allComments.filter((c: any) => c.sentiment === "Neutral").length;
-                    const total = allComments.length;
-                    const posPct = Math.round((pos / total) * 100);
-                    const neuPct = Math.round((neu / total) * 100);
-                    const negPct = Math.round((neg / total) * 100);
-                    const dominant = posPct >= negPct && posPct >= neuPct ? "Bullish" : negPct > posPct && negPct > neuPct ? "Bearish" : "Neutral";
-                    const dominantColor = dominant === "Bullish" ? "var(--mp-green)" : dominant === "Bearish" ? "var(--mp-red)" : "var(--mp-cyan)";
-
-                    return (
-                      <div className="mb-4 rounded-2xl overflow-hidden border border-white/[0.06] relative">
-                        {/* Header gradient */}
-                        <div className="relative px-4 py-3 bg-gradient-to-r from-[var(--mp-cyan)]/10 via-transparent to-[var(--mp-green)]/10">
-                          <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[var(--mp-cyan)]/30 to-transparent" />
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-[var(--mp-cyan)]/20 to-[var(--mp-green)]/20 flex items-center justify-center">
-                                <Brain className="w-3.5 h-3.5 text-[var(--mp-cyan)]" />
-                              </div>
-                              <span className="text-[9px] font-black uppercase tracking-[0.2em] text-white/50">AI Sentiment Analysis</span>
-                            </div>
-                            <div className="flex items-center gap-1.5">
-                              <div className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: dominantColor }} />
-                              <span className="text-[8px] font-black uppercase tracking-wider" style={{ color: dominantColor }}>{dominant}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Donut-style gauge */}
-                        <div className="px-4 py-4 bg-black/20">
-                          <div className="flex items-center gap-4">
-                            {/* Circular gauge */}
-                            <div className="relative w-20 h-20 flex-shrink-0">
-                              <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-                                <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="3" />
-                                <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-green)" strokeWidth="3" strokeDasharray={`${posPct * 0.88} 88`} strokeDashoffset="0" strokeLinecap="round" />
-                                <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-cyan)" strokeWidth="3" strokeDasharray={`${neuPct * 0.88} 88`} strokeDashoffset={`${-posPct * 0.88}`} strokeLinecap="round" />
-                                <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-red)" strokeWidth="3" strokeDasharray={`${negPct * 0.88} 88`} strokeDashoffset={`${-(posPct + neuPct) * 0.88}`} strokeLinecap="round" />
-                              </svg>
-                              <div className="absolute inset-0 flex items-center justify-center flex-col">
-                                <div className="text-[14px] font-black text-foreground leading-none">{total}</div>
-                                <div className="text-[6px] font-bold text-white/30 uppercase tracking-wider">votes</div>
-                              </div>
-                            </div>
-
-                            {/* Stats */}
-                            <div className="flex-1 space-y-2">
-                              {[
-                                { label: "Bullish", pct: posPct, count: pos, color: "var(--mp-green)" },
-                                { label: "Neutral", pct: neuPct, count: neu, color: "var(--mp-cyan)" },
-                                { label: "Bearish", pct: negPct, count: neg, color: "var(--mp-red)" },
-                              ].map(s => (
-                                <div key={s.label}>
-                                  <div className="flex items-center justify-between mb-0.5">
-                                    <div className="flex items-center gap-1.5">
-                                      <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: s.color }} />
-                                      <span className="text-[9px] font-bold text-white/50 uppercase tracking-wider">{s.label}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-[9px] text-white/20">{s.count}</span>
-                                      <span className="text-[11px] font-black" style={{ color: s.color }}>{s.pct}%</span>
-                                    </div>
-                                  </div>
-                                  <div className="w-full h-1 rounded-full bg-white/[0.03] overflow-hidden">
-                                    <div className="h-full rounded-full transition-all duration-700" style={{ width: `${s.pct}%`, backgroundColor: s.color }} />
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
+                  const total = allComments.length;
+                  
+                  return (
+                    <div className="mb-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Brain className="w-4 h-4 text-[var(--mp-cyan)]" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--mp-cyan)]">AI Sentiment Summary</span>
                       </div>
-                    );
-                  }
-                  return null;
+                      
+                      <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-6 mb-6">
+                        <p className="text-[15px] font-bold text-foreground text-center leading-relaxed">
+                          "{detailedPoint.translation || "Resistance level being tested."}"
+                        </p>
+                      </div>
+                      
+                      <div className="text-[13px] font-black text-foreground mb-4">{total} Comments</div>
+
+                      {/* Sentiment filter - match second image style */}
+                      <div className="flex gap-2 mb-6">
+                        {["All", "Positive", "Neutral", "Negative"].map((s) => (
+                          <button 
+                            key={s} 
+                            onClick={() => setSentimentFilter(s)} 
+                            className={`px-4 py-2 rounded-xl text-[10px] font-bold transition-all ${
+                              sentimentFilter === s ? "bg-white text-black" : "bg-white/[0.05] text-white/40 hover:bg-white/10"
+                            }`}
+                          >
+                            {s}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  );
                 })()}
 
-                {/* Sentiment filter */}
-                <div className="flex gap-2 mb-3">
-                  {["All", "Positive", "Neutral", "Negative"].map((s) => (
-                    <button key={s} onClick={() => setSentimentFilter(s)} className={`flex-1 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${sentimentFilter === s ? "bg-foreground text-background" : "bg-white/5 text-white/40"}`}>{s}</button>
-                  ))}
-                </div>
+
 
                 {/* Comments list - own comments first, then others */}
                 <div className="space-y-1">
@@ -1215,95 +1159,105 @@ export default function MarketPulseApp() {
                     </div>
                   ))}
 
-                {/* Comments - compact with replies */}
+                {/* Comments - match second image card style */}
+                <div className="space-y-4 mb-20">
                   {(detailedPoint.comments || [])
                     .filter((c: any) => sentimentFilter === "All" || c.sentiment === sentimentFilter)
                     .slice(0, 30)
                     .map((comment: any, i: number) => {
                       const key = `${detailedPoint.idx}-${i}`;
-                      const vote = commentVotes[key];
-                      const replies = commentReplies[key] || [];
                       return (
-                        <div key={i}>
-                          <div className="flex items-start gap-2 py-1.5 px-1 rounded-lg hover:bg-white/[0.02] transition-colors">
-                            <div className="w-5 h-5 rounded-full bg-white/10 flex items-center justify-center text-[7px] font-black flex-shrink-0 mt-0.5">{comment.user[1]}</div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-1.5">
-                                <span className="text-[10px] font-bold text-white/60">{comment.user}</span>
-                                <span className={`text-[6px] font-black uppercase px-1 py-0.5 rounded ${comment.sentiment === "Positive" ? "bg-[var(--mp-green)]/20 text-[var(--mp-green)]" : comment.sentiment === "Negative" ? "bg-[var(--mp-red)]/20 text-[var(--mp-red)]" : "bg-[var(--mp-cyan)]/20 text-[var(--mp-cyan)]"}`}>{comment.sentiment === "Positive" ? "Bull" : comment.sentiment === "Negative" ? "Bear" : "Meh"}</span>
+                        <div key={i} className="bg-white/[0.03] border border-white/[0.05] rounded-[24px] p-5">
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-sm font-black text-white/60">
+                                {comment.user[1].toUpperCase()}
                               </div>
-                              <p className="text-[10px] text-white/60 leading-snug">{comment.text}</p>
-                              <div className="flex items-center gap-3 mt-0.5">
-                                <div className="flex items-center gap-0.5">
-                                  <button onClick={() => voteComment(key, "up")} className={`p-0.5 rounded ${vote === "up" ? "text-[var(--mp-green)]" : "text-white/15 hover:text-white/30"}`}><TrendingUp className="w-2.5 h-2.5" /></button>
-                                  <span className="text-[8px] text-white/20 min-w-[12px] text-center">{comment.likes + (vote === "up" ? 1 : vote === "down" ? -1 : 0)}</span>
-                                  <button onClick={() => voteComment(key, "down")} className={`p-0.5 rounded ${vote === "down" ? "text-[var(--mp-red)]" : "text-white/15 hover:text-white/30"}`}><TrendingDown className="w-2.5 h-2.5" /></button>
+                              <div className="flex flex-col">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[14px] font-bold text-foreground">{comment.user}</span>
+                                  <Heart className="w-3.5 h-3.5 text-white/20" />
+                                  <span className="text-[11px] text-white/20 font-bold">{comment.likes || 0}</span>
                                 </div>
-                                <button onClick={() => { setReplyingTo(replyingTo === key ? null : key); setReplyText(""); }} className="text-[8px] text-white/20 hover:text-white/40 flex items-center gap-0.5 transition-colors">
-                                  <Reply className="w-2.5 h-2.5" />
-                                  {replies.length > 0 && <span>{replies.length}</span>}
-                                </button>
                               </div>
+                            </div>
+                            <span className={`text-[9px] font-black uppercase px-2 py-1 rounded-[6px] ${
+                              comment.sentiment === "Positive" ? "bg-[var(--mp-green)] text-black" : 
+                              comment.sentiment === "Negative" ? "bg-[var(--mp-red)] text-white" : 
+                              "bg-white text-black"
+                            }`}>
+                              {comment.sentiment}
+                            </span>
+                          </div>
+                          
+                          <p className="text-[14px] text-white/80 leading-relaxed italic mb-3">
+                            "{comment.text}"
+                          </p>
+                          
+                          <div className="flex items-center justify-between pt-2 border-t border-white/[0.03]">
+                            <div className="flex items-center gap-4">
+                              <button className="flex items-center gap-1.5 text-white/20 hover:text-white/40 transition-colors">
+                                <TrendingUp className="w-3.5 h-3.5" />
+                                <span className="text-[10px] font-bold">{comment.likes || 0}</span>
+                              </button>
+                              <button className="flex items-center gap-1.5 text-white/20 hover:text-white/40 transition-colors">
+                                <TrendingDown className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Globe className="w-3.5 h-3.5 text-white/20" />
+                              <span className="text-[8px] font-black uppercase tracking-wider text-white/20">Translated to English</span>
                             </div>
                           </div>
-                          {/* Replies */}
-                          {replies.length > 0 && (
-                            <div className="ml-7 border-l border-white/[0.05] pl-2 mb-1">
-                              {replies.map((r, ri) => (
-                                <div key={ri} className="flex items-start gap-1.5 py-1">
-                                  <CornerDownRight className="w-2.5 h-2.5 text-white/10 flex-shrink-0 mt-0.5" />
-                                  <div className="min-w-0">
-                                    <span className="text-[9px] font-bold text-[var(--mp-purple)]">{r.user}</span>
-                                    <p className="text-[9px] text-white/50 leading-snug">{r.text}</p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                          {/* Reply input */}
-                          {replyingTo === key && (
-                            <div className="ml-7 flex items-center gap-1.5 mb-1">
-                              <input type="text" value={replyText} onChange={(e) => setReplyText(e.target.value)} onKeyDown={(e) => e.key === "Enter" && submitReply(key)} placeholder="Reply..." className="flex-1 bg-white/[0.03] border border-white/[0.06] rounded-lg px-2 py-1 text-[9px] text-foreground focus:outline-none focus:border-[var(--mp-cyan)]/30" autoFocus />
-                              <button onClick={() => submitReply(key)} disabled={!replyText.trim()} className="p-1 text-[var(--mp-cyan)] disabled:text-white/10"><Send className="w-3 h-3" /></button>
-                            </div>
-                          )}
                         </div>
                       );
                     })}
+                </div>
+                
+                {/* Fixed Comment Input at bottom */}
+                <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-[#0D0E14] via-[#0D0E14] to-transparent">
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      placeholder="Write your comment..." 
+                      className="w-full bg-white/[0.05] border border-white/10 rounded-2xl py-4 px-6 text-[13px] text-foreground focus:outline-none focus:border-[var(--mp-cyan)]/50 transition-all shadow-2xl"
+                    />
+                    <button className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-xl bg-[var(--mp-cyan)]/10 flex items-center justify-center text-[var(--mp-cyan)] hover:bg-[var(--mp-cyan)]/20 transition-all">
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                </div>
                 </div>
               </motion.div>
             </>
           )}
         </AnimatePresence>
 
-        {/* Bottom Navigation */}
-        <nav className="absolute bottom-0 inset-x-0 z-[100] bg-black/40 backdrop-blur-[40px] border-t border-white/[0.03] px-4 pt-3 pb-8">
-          <svg width="0" height="0" className="absolute"><defs><linearGradient id="navDotGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#00FFFF"><animate attributeName="stop-color" values="#00FFFF;#39FF14;#00FFFF" dur="3s" repeatCount="indefinite" /></stop><stop offset="100%" stopColor="#39FF14"><animate attributeName="stop-color" values="#39FF14;#00FFFF;#39FF14" dur="3s" repeatCount="indefinite" /></stop></linearGradient></defs></svg>
-          <div className="flex items-center justify-around">
+        {/* Bottom Navigation - Redesigned to match image */}
+        <nav className="absolute bottom-0 inset-x-0 z-[140] bg-[#0D0E14]/80 backdrop-blur-2xl border-t border-white/[0.03] px-6 py-6">
+          <div className="flex items-center justify-between max-w-sm mx-auto">
             {[
-              { id: "dashboard", label: "Home", isLogo: true },
-              { id: "watchlist", label: t.watchlist, icon: List },
-              { id: "markets", label: t.markets, icon: Globe },
-              { id: "community", label: t.community, icon: Users },
-              { id: "profile", label: "Profile", icon: Settings },
+              { id: "dashboard", icon: Activity, isLogo: true },
+              { id: "watchlist", icon: List },
+              { id: "markets", icon: Globe },
+              { id: "community", icon: Users },
+              { id: "profile", icon: Settings },
             ].map((tab) => (
-              <button key={tab.id} onClick={() => { setActiveTab(tab.id); setProfilePage(null); }} className="flex flex-col items-center gap-1.5 relative py-1 w-14">
-                <div className={`transition-all duration-300 ${activeTab === tab.id ? "text-white scale-110" : "text-[#4A4B5D]"}`}>
-                  {tab.isLogo ? (
-                    <img src={APP_ASSETS.tabLogo} alt="" className={`w-6 h-6 object-contain transition-all duration-300 ${activeTab === tab.id ? "opacity-100 brightness-200" : "opacity-30 grayscale"}`} />
-                  ) : (
-                    <tab.icon className="w-5 h-5" strokeWidth={activeTab === tab.id ? 2.5 : 1.5} />
-                  )}
+              <button 
+                key={tab.id} 
+                onClick={() => { setActiveTab(tab.id); setProfilePage(null); }} 
+                className="flex flex-col items-center relative py-1"
+              >
+                <div className={`transition-all duration-300 ${activeTab === tab.id ? "text-white" : "text-white/20 hover:text-white/40"}`}>
+                  <tab.icon className="w-6 h-6" strokeWidth={activeTab === tab.id ? 2.5 : 1.5} />
                 </div>
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeNavDot"
-                    className="absolute -bottom-1"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                  >
-                    <svg width="6" height="6"><circle cx="3" cy="3" r="3" fill="url(#navDotGrad)" /></svg>
-                    <div className="absolute inset-0 blur-[4px]"><svg width="6" height="6"><circle cx="3" cy="3" r="3" fill="url(#navDotGrad)" /></svg></div>
-                  </motion.div>
+                    className="absolute -bottom-3 w-1 h-1 bg-[var(--mp-cyan)] rounded-full shadow-[0_0_8px_var(--mp-cyan)]"
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  />
                 )}
               </button>
             ))}
