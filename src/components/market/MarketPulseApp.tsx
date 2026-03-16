@@ -60,13 +60,23 @@ export default function MarketPulseApp() {
   const [commentsTimeframe, setCommentsTimeframe] = useState("Daily");
 
   const [watchlistAssets, setWatchlistAssets] = useState<string[]>(() => {
-    const saved = localStorage.getItem("watchlistAssets");
-    return saved ? JSON.parse(saved) : ["AAPL", "TSLA", "NVDA", "BTC", "GOLD", "ETH", "SOL", "NASDAQ"];
+    try {
+      const saved = localStorage.getItem("watchlistAssets");
+      return saved ? JSON.parse(saved) : ["AAPL", "TSLA", "NVDA", "BTC", "GOLD", "ETH", "SOL", "NASDAQ"];
+    } catch (e) {
+      console.error("Failed to parse watchlistAssets from localStorage", e);
+      return ["AAPL", "TSLA", "NVDA", "BTC", "GOLD", "ETH", "SOL", "NASDAQ"];
+    }
   });
-
+  
   const [pinnedAssets, setPinnedAssets] = useState<string[]>(() => {
-    const saved = localStorage.getItem("pinnedAssets");
-    return saved ? JSON.parse(saved) : ["BTC", "AAPL", "GOLD"];
+    try {
+      const saved = localStorage.getItem("pinnedAssets");
+      return saved ? JSON.parse(saved) : ["BTC", "AAPL", "GOLD"];
+    } catch (e) {
+      console.error("Failed to parse pinnedAssets from localStorage", e);
+      return ["BTC", "AAPL", "GOLD"];
+    }
   });
 
   const [isEditPinned, setIsEditPinned] = useState(false);
@@ -143,6 +153,15 @@ export default function MarketPulseApp() {
   const activeUserComments = useMemo(() => userComments.filter((c) => c.assetId === selectedAssetId && c.timeframe === timeframe), [userComments, selectedAssetId, timeframe]);
   const allAssetUserComments = useMemo(() => userComments.filter((c) => c.assetId === selectedAssetId), [userComments, selectedAssetId]);
 
+  // Chart math
+  const minVal = Math.min(...activeData) * 0.995;
+  const maxVal = Math.max(...activeData) * 1.005;
+  const range = maxVal - minVal;
+  const getX = (i: number) => 4 + (i / (activeData.length - 1)) * 92;
+  const getY = (v: number) => 8 + (100 - ((v - minVal) / range) * 100) * 0.84;
+  const pathD = activeData.map((d, i) => `${i === 0 ? "M" : "L"} ${getX(i)} ${getY(d)}`).join(" ");
+  const areaD = `${pathD} L ${getX(activeData.length - 1)} 100 L ${getX(0)} 100 Z`;
+
   // Sentiment clustering — group nearby price comments into max 5 clusters
   const sentimentClusters = useMemo(() => {
     if (activeUserComments.length === 0) return [];
@@ -194,15 +213,6 @@ export default function MarketPulseApp() {
     // Limit to 5 largest clusters
     return clusters.sort((a, b) => b.count - a.count).slice(0, 5);
   }, [activeUserComments, minVal, maxVal]);
-
-  // Chart math
-  const minVal = Math.min(...activeData) * 0.995;
-  const maxVal = Math.max(...activeData) * 1.005;
-  const range = maxVal - minVal;
-  const getX = (i: number) => 4 + (i / (activeData.length - 1)) * 92;
-  const getY = (v: number) => 8 + (100 - ((v - minVal) / range) * 100) * 0.84;
-  const pathD = activeData.map((d, i) => `${i === 0 ? "M" : "L"} ${getX(i)} ${getY(d)}`).join(" ");
-  const areaD = `${pathD} L ${getX(activeData.length - 1)} 100 L ${getX(0)} 100 Z`;
 
   const handleChartTap = (e: React.MouseEvent<HTMLDivElement>) => {
     if (chartCrosshair) { setChartCrosshair(null); return; }
