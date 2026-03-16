@@ -481,7 +481,7 @@ export default function MarketPulseApp() {
                                 <div className={`rounded-full transition-all duration-300 flex items-center justify-center overflow-hidden ${
                                   isSelected
                                     ? `w-28 h-28 flex-shrink-0 ${isNews ? "mp-gradient-badge shadow-[0_10px_30px_rgba(0,255,255,0.4)]" : "bg-foreground shadow-[0_10px_30px_rgba(255,255,255,0.3)]"}`
-                                    : `w-3 h-3 flex-shrink-0 hover:scale-150 border border-white/20 ${isNews ? "bg-[var(--mp-cyan)] shadow-[0_0_10px_rgba(0,255,255,0.5)]" : "bg-white shadow-[0_0_8px_rgba(255,255,255,0.4)]"}`
+                                    : `w-3 h-3 flex-shrink-0 hover:scale-150 border border-white/20 ${isNews ? "bg-[var(--mp-cyan)] shadow-[0_0_10px_rgba(0,255,255,0.5)]" : "bg-foreground shadow-[0_0_8px_rgba(255,255,255,0.4)]"}`
                                 }`}>
                                   {isSelected && (
                                     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="p-3 text-center flex flex-col items-center justify-center h-full w-full relative">
@@ -1133,7 +1133,7 @@ export default function MarketPulseApp() {
                       </div>
                       
                       <div className="bg-white/[0.03] border border-white/[0.08] rounded-2xl p-5 mb-6">
-                        <p className="text-[14px] font-bold text-foreground text-center leading-relaxed italic opacity-90">
+                        <p className="text-[14px] font-bold text-foreground text-center leading-relaxed opacity-90">
                           "{detailedPoint.translation || "Resistance level being tested."}"
                         </p>
                       </div>
@@ -1230,15 +1230,15 @@ export default function MarketPulseApp() {
                               </div>
                             </div>
                             <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-[5px] ${
-                              comment.sentiment === "Positive" ? "bg-[var(--mp-green)]/10 text-[var(--mp-green)]" : 
-                              comment.sentiment === "Negative" ? "bg-[var(--mp-red)]/10 text-[var(--mp-red)]" : 
-                              "bg-white/10 text-white"
+                              comment.sentiment === "Positive" ? "bg-[var(--mp-green)] text-black" : 
+                              comment.sentiment === "Negative" ? "bg-[var(--mp-red)] text-white" : 
+                              "bg-white text-black"
                             }`}>
                               {comment.sentiment}
                             </span>
                           </div>
                           
-                          <p className="text-[12px] text-white/60 leading-relaxed mb-3 pr-2">
+                          <p className="text-[13px] text-white/90 leading-relaxed mb-3 pr-2 font-medium">
                             {comment.text}
                           </p>
                           
@@ -1296,13 +1296,13 @@ export default function MarketPulseApp() {
                 onClick={() => { setActiveTab(tab.id); setProfilePage(null); }} 
                 className="flex flex-col items-center relative py-1"
               >
-                <div className={`transition-all duration-300 ${activeTab === tab.id ? "text-white" : "text-white/20 hover:text-white/40"}`}>
-                  <tab.icon className="w-6 h-6" strokeWidth={activeTab === tab.id ? 2.5 : 1.5} />
+                <div className={`transition-all duration-300 ${activeTab === tab.id ? "text-white" : "text-[#525263] hover:text-white/40"}`}>
+                  <tab.icon className="w-6 h-6" strokeWidth={activeTab === tab.id ? 2.5 : 2} />
                 </div>
                 {activeTab === tab.id && (
                   <motion.div
                     layoutId="activeNavDot"
-                    className="absolute -bottom-3 w-1 h-1 bg-[var(--mp-cyan)] rounded-full shadow-[0_0_8px_var(--mp-cyan)]"
+                    className="absolute -bottom-2 w-1 h-1 bg-[var(--mp-cyan)] rounded-full shadow-[0_0_8px_var(--mp-cyan)]"
                     transition={{ type: "spring", stiffness: 500, damping: 30 }}
                   />
                 )}
