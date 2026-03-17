@@ -7,7 +7,10 @@
       "Bash(netstat -ano)",
       "Bash(taskkill /PID 19092 /F)",
       "Bash(wmic process:*)",
-      "Bash(taskkill.exe /PID 19092 /F)"
+      "Bash(taskkill.exe /PID 19092 /F)",
+      "Bash(taskkill /PID 17460 /F)",
+      "Bash(npm run:*)",
+      "Bash(curl -s http://localhost:8081)"
     ]
   }
 }
