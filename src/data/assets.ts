@@ -70,7 +70,32 @@ const assetConfigs = [
   { id: "KCHOL", name: "Koç Holding", symbol: "KCHOL.IS", category: "Stocks", price: 92.15, change: "+2.1%", isUp: true },
 ];
 
-export const ASSETS: Asset[] = assetConfigs;
+// Initialize ASSETS with data
+const initAssets = (): Asset[] => {
+  return assetConfigs.map(config => {
+    const data: Record<string, number[]> = {};
+    const dataConfig: Record<string, [number, number]> = {
+      "1H": [30, 0.5],
+      "1D": [30, 2],
+      "1W": [30, 5],
+      "1M": [30, 10],
+      "1Y": [30, 25],
+      "ALL": [30, 50],
+    };
+
+    for (const [period, [points, vol]] of Object.entries(dataConfig)) {
+      const key = `${config.id}-${period}`;
+      if (!dataCache.has(key)) {
+        dataCache.set(key, generateRealisticData(points, config.price, vol));
+      }
+      data[period] = dataCache.get(key)!;
+    }
+
+    return { ...config, data };
+  });
+};
+
+export const ASSETS: Asset[] = initAssets();
 
 export const getAssetData = (assetId: string): Record<string, number[]> => {
   const asset = assetConfigs.find(a => a.id === assetId);
