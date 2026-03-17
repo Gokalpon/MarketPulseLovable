@@ -1,4 +1,0 @@
-project_id = "cmoafsypyickxqvpilor"
-
-[functions.market-data]
-verify_jwt = false
