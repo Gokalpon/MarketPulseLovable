@@ -62,6 +62,12 @@ const assetConfigs = [
   { id: "SILVER", name: "Silver", symbol: "XAG/USD", category: "Commodities", price: 22.80, change: "+1.2%", isUp: true },
   { id: "OIL", name: "Crude Oil", symbol: "WTI", category: "Commodities", price: 78.40, change: "+1.8%", isUp: true },
   { id: "COPPER", name: "Copper", symbol: "HG", category: "Commodities", price: 3.85, change: "-0.4%", isUp: false },
+  { id: "BIST100", name: "BIST 100", symbol: "XU100.IS", category: "Stocks", price: 8450.23, change: "+1.8%", isUp: true },
+  { id: "ASELS", name: "Aselsan", symbol: "ASELS.IS", category: "Stocks", price: 156.80, change: "+2.3%", isUp: true },
+  { id: "THYAO", name: "Turkish Airlines", symbol: "THYAO.IS", category: "Stocks", price: 28.45, change: "-1.2%", isUp: false },
+  { id: "GARAN", name: "Garanti Bank", symbol: "GARAN.IS", category: "Stocks", price: 45.60, change: "+0.9%", isUp: true },
+  { id: "SASA", name: "Sasaş", symbol: "SASA.IS", category: "Stocks", price: 89.30, change: "+1.5%", isUp: true },
+  { id: "KCHOL", name: "Koç Holding", symbol: "KCHOL.IS", category: "Stocks", price: 92.15, change: "+2.1%", isUp: true },
 ];
 
 export const ASSETS: Asset[] = assetConfigs;
