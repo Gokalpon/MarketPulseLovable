@@ -906,14 +906,14 @@ export default function MarketPulseApp() {
                               <div><div className="font-bold text-[14px] text-white/90">{t.language}</div><div className="text-[10px] text-[var(--mp-text-secondary)]">{t.targetLanguage}</div></div>
                             </div>
                             <div className="relative z-[60]">
-                              <button onClick={(e) => { e.stopPropagation(); setShowLanguageMenu(!showLanguageMenu); }} className="w-full flex items-center justify-between bg-white/[0.03] border border-white/[0.08] px-4 py-3 rounded-xl">
+                              <button ref={(el) => { const btn = el; if (btn && showLanguageMenu) { const rect = btn.getBoundingClientRect(); (document.querySelector('[data-lang-menu]') as HTMLElement)?.style.setProperty('--button-bottom', `${rect.bottom + 10}px`); } }} onClick={(e) => { e.stopPropagation(); setShowLanguageMenu(!showLanguageMenu); }} className="w-full flex items-center justify-between bg-white/[0.03] border border-white/[0.08] px-4 py-3 rounded-xl">
                                 <span className="text-[10px] font-black uppercase tracking-[0.15em] text-foreground">{language}</span>
                                 <ChevronDown className={`w-3 h-3 text-white/40 transition-transform ${showLanguageMenu ? "rotate-180" : ""}`} />
                               </button>
                               {showLanguageMenu && (
                                 <>
                                   <div onClick={() => setShowLanguageMenu(false)} className="fixed inset-0 z-[200]" />
-                                  <div className="absolute bottom-full left-0 right-0 mb-2 z-[201] bg-[#0D0E14] border border-white/[0.1] rounded-xl p-2.5 shadow-[0_-10px_50px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-1.5">
+                                  <div data-lang-menu className="fixed z-[201] bg-[#0D0E14] border border-white/[0.1] rounded-xl p-2.5 shadow-[0_10px_50px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-1.5 max-h-[250px] overflow-y-auto w-[300px]" style={{left: 'calc(50% - 150px)', top: 'var(--button-bottom, 400px)'}}>
                                     {["English", "Turkish", "German", "French", "Spanish", "Italian", "Russian", "Chinese"].map((lang) => (
                                       <button key={lang} onClick={(e) => { e.stopPropagation(); setLanguage(lang); setShowLanguageMenu(false); }} className={`px-3 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-center ${language === lang ? "bg-foreground text-background" : "text-white/40 hover:bg-white/5"}`}>{lang}</button>
                                     ))}
