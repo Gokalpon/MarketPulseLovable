@@ -883,7 +883,7 @@ export default function MarketPulseApp() {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-4">
                             <div className="w-11 h-11 rounded-xl mp-gradient-badge-purple flex items-center justify-center shadow-[0_0_15px_rgba(178,75,243,0.3)]"><MessageCircle className="w-5 h-5 text-background" /></div>
-                            <div><span className="font-bold text-[15px] text-foreground">{language === "Turkish" ? "Yorumlarım" : "My Comments"}</span><div className="text-[11px] text-[var(--mp-text-secondary)]">{userComments.length} {language === "Turkish" ? "toplam yorum" : "total comments"}</div></div>
+                            <div><span className="font-bold text-[15px] text-foreground">{language === "Turkish" ? "Yorumlarım" : "My Comments"}</span></div>
                           </div>
                           <ChevronRight className="w-4 h-4 text-[var(--mp-purple)]" />
                         </div>
@@ -945,7 +945,7 @@ export default function MarketPulseApp() {
                       <button onClick={() => setProfilePage(null)} className="flex items-center gap-2 text-[var(--mp-text-secondary)] text-[12px] font-bold uppercase tracking-wider mb-6 hover:text-foreground transition-colors"><ChevronRight className="w-4 h-4 rotate-180" /> Profile</button>
                       <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-xl mp-gradient-badge-purple flex items-center justify-center"><MessageCircle className="w-5 h-5 text-background" /></div>
-                        <div><h3 className="text-xl font-black uppercase">{language === "Turkish" ? "Yorumlarım" : "My Comments"}</h3><p className="text-[11px] text-[var(--mp-text-secondary)]">{userComments.length} {language === "Turkish" ? "toplam" : "total"}</p></div>
+                        <div><h3 className="text-xl font-black uppercase">{language === "Turkish" ? "Yorumlarım" : "My Comments"}</h3></div>
                       </div>
                       {userComments.length === 0 ? (
                         <div className="text-center py-16"><MessageCircle className="w-10 h-10 text-white/10 mx-auto mb-3" /><p className="text-[13px] text-[var(--mp-text-secondary)]">{language === "Turkish" ? "Henüz yorum yazmadınız." : "No comments yet."}</p></div>
