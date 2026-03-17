@@ -6,7 +6,7 @@ import {
   Share2, Newspaper, Send, Edit3, Trash2, ExternalLink, Settings, Wifi, WifiOff,
   Reply, CornerDownRight
 } from "lucide-react";
-import { ASSETS, APP_ASSETS, COMMUNITY_POSTS, getMockTranslations } from "@/data/assets";
+import { ASSETS, APP_ASSETS, COMMUNITY_POSTS, getMockTranslations, getAssetData } from "@/data/assets";
 import { TRANSLATIONS } from "@/data/translations";
 import { Sparkline } from "@/components/market/Sparkline";
 import { NotifToggle } from "@/components/market/NotifToggle";
@@ -125,7 +125,7 @@ export default function MarketPulseApp() {
 
   const activeAsset = useMemo(() => ASSETS.find((a) => a.id === selectedAssetId) || ASSETS[0], [selectedAssetId]);
   const fallbackData = useMemo(() => {
-    const data = require("@/data/assets").getAssetData(selectedAssetId);
+    const data = getAssetData(selectedAssetId);
     return data[timeframe] || data["1D"] || [];
   }, [selectedAssetId, timeframe]);
   const activeTranslations = useMemo(() => getMockTranslations(selectedAssetId), [selectedAssetId]);

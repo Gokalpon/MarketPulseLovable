@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dev-server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 8080
+    },
+    {
+      "name": "test-watch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "test:watch"],
+      "port": null
+    },
+    {
+      "name": "lint",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "lint"],
+      "port": null
+    }
+  ]
+}
