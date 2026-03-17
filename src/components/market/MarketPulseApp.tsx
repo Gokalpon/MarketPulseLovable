@@ -329,10 +329,34 @@ export default function MarketPulseApp() {
           {isSearchActive && (
             <>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setIsSearchActive(false)} className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[140]" />
-              <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute top-[110px] inset-x-0 px-6 py-6 z-[145] bg-black/80 backdrop-blur-2xl border-b border-white/[0.05] shadow-2xl">
-                <div className="relative max-w-md mx-auto">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--mp-text-secondary)]" />
-                  <input type="text" placeholder="Search assets, profiles..." className="w-full bg-white/5 border border-white/[0.05] rounded-2xl pl-12 pr-4 py-4 text-base text-foreground focus:outline-none focus:border-[var(--mp-cyan)]/50 transition-colors shadow-inner" autoFocus />
+              <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="absolute top-[110px] inset-x-0 px-6 z-[145] bg-black/80 backdrop-blur-2xl border-b border-white/[0.05] shadow-2xl max-h-[500px] overflow-y-auto">
+                <div className="py-6 max-w-2xl mx-auto">
+                  <div className="relative mb-6">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[var(--mp-text-secondary)]" />
+                    <input type="text" placeholder={language === "Turkish" ? "Kripto, hisse, borsa ara..." : "Search crypto, stocks, exchanges..."} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full bg-white/5 border border-white/[0.05] rounded-2xl pl-12 pr-4 py-4 text-base text-foreground focus:outline-none focus:border-[var(--mp-cyan)]/50 transition-colors shadow-inner" autoFocus />
+                  </div>
+                  {searchQuery.length > 0 && (
+                    <div className="space-y-2">
+                      {ASSETS.filter((a) => a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.symbol.toLowerCase().includes(searchQuery.toLowerCase()) || a.id.toLowerCase().includes(searchQuery.toLowerCase())).map((asset) => (
+                        <div key={asset.id} onClick={() => { setSelectedAssetId(asset.id); setIsSearchActive(false); setSearchQuery(""); }} className="flex items-center justify-between px-4 py-3 rounded-xl bg-white/[0.03] hover:bg-white/[0.08] cursor-pointer transition-colors border border-white/[0.05]">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-white/10 to-white/5 flex items-center justify-center text-sm font-black text-[var(--mp-cyan)]">{asset.id[0]}</div>
+                            <div>
+                              <div className="text-sm font-bold text-foreground">{asset.name}</div>
+                              <div className="text-xs text-white/40">{asset.symbol} • {asset.category}</div>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className={`text-sm font-bold ${asset.isUp ? "text-[var(--mp-green)]" : "text-[var(--mp-red)]"}`}>${asset.price.toFixed(2)}</div>
+                            <div className={`text-xs font-bold ${asset.isUp ? "text-[var(--mp-green)]" : "text-[var(--mp-red)]"}`}>{asset.change}</div>
+                          </div>
+                        </div>
+                      ))}
+                      {ASSETS.filter((a) => a.name.toLowerCase().includes(searchQuery.toLowerCase()) || a.symbol.toLowerCase().includes(searchQuery.toLowerCase()) || a.id.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                        <div className="text-center py-8 text-white/30">{language === "Turkish" ? "Varlık bulunamadı" : "No assets found"}</div>
+                      )}
+                    </div>
+                  )}
                 </div>
               </motion.div>
             </>
@@ -561,7 +585,7 @@ export default function MarketPulseApp() {
                       {showAIConsensus ? t.hideConsensus : t.showConsensus}
                     </button>
                     <button onClick={() => setShowMyComments(true)} className={`flex-1 px-2 py-2 rounded-xl text-[8px] font-black uppercase tracking-[0.2em] transition-all border ${activeUserComments.length > 0 ? "mp-gradient-badge-purple text-background border-transparent shadow-[0_0_15px_rgba(178,75,243,0.3)]" : "bg-white/5 text-white/40 border-white/10"}`}>
-                      {language === "Turkish" ? `Yorumlarım (${allAssetUserComments.length})` : `My Comments (${allAssetUserComments.length})`}
+                      {language === "Turkish" ? "Yorumlarım" : "My Comments"}
                     </button>
                   </div>
 
@@ -888,7 +912,7 @@ export default function MarketPulseApp() {
                               </button>
                               {showLanguageMenu && (
                                 <>
-                                  <div onClick={(e) => { e.stopPropagation(); setShowLanguageMenu(false); }} className="fixed inset-0 z-[200]" />
+                                  <div onClick={() => setShowLanguageMenu(false)} className="fixed inset-0 z-[200]" />
                                   <div className="absolute bottom-full left-0 right-0 mb-2 z-[201] bg-[#0D0E14] border border-white/[0.1] rounded-xl p-2.5 shadow-[0_-10px_50px_rgba(0,0,0,0.8)] grid grid-cols-2 gap-1.5">
                                     {["English", "Turkish", "German", "French", "Spanish", "Italian", "Russian", "Chinese"].map((lang) => (
                                       <button key={lang} onClick={(e) => { e.stopPropagation(); setLanguage(lang); setShowLanguageMenu(false); }} className={`px-3 py-2.5 rounded-lg text-[9px] font-black uppercase tracking-wider text-center ${language === lang ? "bg-foreground text-background" : "text-white/40 hover:bg-white/5"}`}>{lang}</button>
@@ -926,25 +950,32 @@ export default function MarketPulseApp() {
                       {userComments.length === 0 ? (
                         <div className="text-center py-16"><MessageCircle className="w-10 h-10 text-white/10 mx-auto mb-3" /><p className="text-[13px] text-[var(--mp-text-secondary)]">{language === "Turkish" ? "Henüz yorum yazmadınız." : "No comments yet."}</p></div>
                       ) : (
-                        <div className="space-y-3">
-                          {userComments.map((uc: any) => (
-                            <div key={uc.id} className="mp-glass-card rounded-2xl p-4">
-                              <div className="flex justify-between items-start mb-2">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-[12px] font-bold text-foreground">{ASSETS.find((a) => a.id === uc.assetId)?.name || uc.assetId}</span>
-                                  <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${uc.sentiment === "Positive" ? "bg-[var(--mp-green)] text-background" : uc.sentiment === "Negative" ? "bg-[#FF3131] text-foreground" : "bg-[var(--mp-cyan)] text-background"}`}>{uc.sentiment}</span>
+                        <>
+                          <div className="space-y-3">
+                            {userComments.map((uc: any) => (
+                              <div key={uc.id} className="mp-glass-card rounded-2xl p-4">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-[12px] font-bold text-foreground">{ASSETS.find((a) => a.id === uc.assetId)?.name || uc.assetId}</span>
+                                    <span className={`text-[9px] font-black uppercase px-2 py-0.5 rounded-md ${uc.sentiment === "Positive" ? "bg-[var(--mp-green)] text-background" : uc.sentiment === "Negative" ? "bg-[#FF3131] text-foreground" : "bg-[var(--mp-cyan)] text-background"}`}>{uc.sentiment}</span>
+                                  </div>
+                                  <button onClick={() => deleteComment(uc.id)} className="p-1 hover:bg-white/10 rounded-lg"><Trash2 className="w-3.5 h-3.5 text-[var(--mp-text-secondary)]" /></button>
                                 </div>
-                                <button onClick={() => deleteComment(uc.id)} className="p-1 hover:bg-white/10 rounded-lg"><Trash2 className="w-3.5 h-3.5 text-[var(--mp-text-secondary)]" /></button>
+                                <p className="text-[14px] text-white/80 leading-relaxed mb-2">{uc.text}</p>
+                                <div className="flex items-center gap-3 text-[10px] text-white/20">
+                                  <span>${uc.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                                  <span>{uc.timeframe}</span>
+                                  <span>{new Date(uc.timestamp).toLocaleDateString()}</span>
+                                </div>
                               </div>
-                              <p className="text-[14px] text-white/80 leading-relaxed mb-2">{uc.text}</p>
-                              <div className="flex items-center gap-3 text-[10px] text-white/20">
-                                <span>${uc.price?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
-                                <span>{uc.timeframe}</span>
-                                <span>{new Date(uc.timestamp).toLocaleDateString()}</span>
-                              </div>
-                            </div>
-                          ))}
-                        </div>
+                            ))}
+                          </div>
+                          <div className="flex justify-center gap-1.5 mt-6 pt-4 border-t border-white/5">
+                            {Array.from({ length: Math.min(userComments.length, 5) }).map((_, i) => (
+                              <div key={i} className={`w-2 h-2 rounded-full transition-all ${i < userComments.length ? "bg-[var(--mp-cyan)]" : "bg-white/10"}`} />
+                            ))}
+                          </div>
+                        </>
                       )}
                     </motion.div>
                   ) : profilePage === "account" ? (
@@ -1142,28 +1173,37 @@ export default function MarketPulseApp() {
                       </div>
 
                       {total >= 10 && (
-                        <div className="px-5 py-4 bg-white/[0.02] border border-white/[0.04] rounded-2xl mb-6">
-                          <div className="flex items-center gap-6">
-                            <div className="relative w-16 h-16 flex-shrink-0">
+                        <div className="px-5 py-6 bg-gradient-to-br from-white/[0.03] to-white/[0.01] border border-white/[0.06] rounded-2xl mb-6 backdrop-blur-sm">
+                          <div className="flex items-center gap-8">
+                            <div className="relative w-28 h-28 flex-shrink-0">
                                 <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-                                  <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="3" />
-                                  <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-green)" strokeWidth="3" strokeDasharray={`${posPct * 0.88} 88`} strokeDashoffset="0" strokeLinecap="round" />
-                                  <circle cx="18" cy="18" r="14" fill="none" stroke="white" strokeWidth="3" strokeDasharray={`${neuPct * 0.88} 88`} strokeDashoffset={`${-posPct * 0.88}`} strokeLinecap="round" />
-                                  <circle cx="18" cy="18" r="14" fill="none" stroke="var(--mp-red)" strokeWidth="3" strokeDasharray={`${negPct * 0.88} 88`} strokeDashoffset={`${-(posPct + neuPct) * 0.88}`} strokeLinecap="round" />
+                                  <defs>
+                                    <linearGradient id="posGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                                      <stop offset="0%" stopColor="#00FFFF" />
+                                      <stop offset="100%" stopColor="#39FF14" />
+                                    </linearGradient>
+                                  </defs>
+                                  <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.03)" strokeWidth="2.5" />
+                                  <circle cx="18" cy="18" r="14" fill="none" stroke="url(#posGrad)" strokeWidth="2.5" strokeDasharray={`${posPct * 0.88} 88`} strokeDashoffset="0" strokeLinecap="round" />
+                                  <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="2.5" strokeDasharray={`${neuPct * 0.88} 88`} strokeDashoffset={`${-posPct * 0.88}`} strokeLinecap="round" />
+                                  <circle cx="18" cy="18" r="14" fill="none" stroke="#FF4444" strokeWidth="2.5" strokeDasharray={`${negPct * 0.88} 88`} strokeDashoffset={`${-(posPct + neuPct) * 0.88}`} strokeLinecap="round" />
                                 </svg>
                                 <div className="absolute inset-0 flex items-center justify-center flex-col">
-                                  <div className="text-[12px] font-black text-foreground leading-none">{total}</div>
-                                  <div className="text-[5px] font-bold text-white/30 uppercase tracking-widest">votes</div>
+                                  <div className="text-[20px] font-black text-foreground leading-none">{total}</div>
+                                  <div className="text-[8px] font-bold text-white/40 uppercase tracking-widest mt-1">sentiment</div>
                                 </div>
                             </div>
-                            <div className="flex-1 space-y-1.5">
+                            <div className="flex-1 space-y-2.5">
                               {[
-                                { label: "Positive", pct: posPct, color: "var(--mp-green)" },
-                                { label: "Neutral", pct: neuPct, color: "white" },
-                                { label: "Negative", pct: negPct, color: "var(--mp-red)" },
+                                { label: "Positive", pct: posPct, color: "#00FFFF" },
+                                { label: "Neutral", pct: neuPct, color: "rgba(255,255,255,0.4)" },
+                                { label: "Negative", pct: negPct, color: "#FF4444" },
                               ].map(s => (
-                                <div key={s.label} className="flex items-center justify-between text-[10px]">
-                                  <span className="text-white/40 font-bold uppercase tracking-wider">{s.label}</span>
+                                <div key={s.label} className="flex items-center justify-between text-[11px]">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-2 h-2 rounded-full" style={{ backgroundColor: s.color }} />
+                                    <span className="text-white/50 font-bold uppercase tracking-wider">{s.label}</span>
+                                  </div>
                                   <span className="font-black" style={{ color: s.color }}>{s.pct}%</span>
                                 </div>
                               ))}
@@ -1212,52 +1252,53 @@ export default function MarketPulseApp() {
                     </div>
                   ))}
 
-                {/* Comments list - Cleaned up and smaller */}
-                <div className="space-y-3 mb-24">
+                {/* Comments list - Premium frosted glass design */}
+                <div className="space-y-3 mb-32">
                   {(detailedPoint.comments || [])
                     .filter((c: any) => sentimentFilter === "All" || c.sentiment === sentimentFilter)
                     .slice(0, 30)
                     .map((comment: any, i: number) => {
                       return (
-                        <div key={i} className="bg-white/[0.03] border border-white/[0.05] rounded-[20px] p-4">
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[10px] font-black text-white/60">
+                        <div key={i} className="group bg-white/[0.05] backdrop-blur-md border border-white/[0.08] rounded-[24px] p-4 hover:bg-white/[0.08] hover:border-white/[0.12] transition-all duration-300 shadow-[0_8px_32px_rgba(0,0,0,0.3)]">
+                          <div className="flex justify-between items-start mb-3">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-white/20 to-white/5 flex items-center justify-center text-[11px] font-black text-[var(--mp-cyan)] border border-white/10">
                                 {comment.user[1].toUpperCase()}
                               </div>
                               <div className="flex flex-col">
-                                <div className="flex items-center gap-1.5">
-                                  <span className="text-[12px] font-bold text-foreground/90">{comment.user}</span>
-                                  <span className="text-[9px] text-white/20 font-bold flex items-center gap-0.5"><Heart className="w-2.5 h-2.5" /> {comment.likes || 0}</span>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[13px] font-bold text-foreground">{comment.user}</span>
+                                  <span className={`text-[8px] font-black uppercase px-2 py-1 rounded-full ${
+                                    comment.sentiment === "Positive" ? "bg-gradient-to-r from-[var(--mp-cyan)] to-[var(--mp-green)] text-black" :
+                                    comment.sentiment === "Negative" ? "bg-[#FF4444] text-white" :
+                                    "bg-white/15 text-white"
+                                  }`}>
+                                    {comment.sentiment}
+                                  </span>
                                 </div>
+                                <span className="text-[9px] text-white/30 mt-0.5 font-bold">{comment.likes || 0} {language === "Turkish" ? "beğeni" : "likes"}</span>
                               </div>
                             </div>
-                            <span className={`text-[8px] font-black uppercase px-2 py-0.5 rounded-[5px] ${
-                              comment.sentiment === "Positive" ? "bg-[var(--mp-green)] text-black" : 
-                              comment.sentiment === "Negative" ? "bg-[var(--mp-red)] text-white" : 
-                              "bg-white text-black"
-                            }`}>
-                              {comment.sentiment}
-                            </span>
                           </div>
-                          
-                          <p className="text-[13px] text-white/90 leading-relaxed mb-3 pr-2 font-medium">
+
+                          <p className="text-[13px] text-white/85 leading-relaxed mb-3 pl-1 font-medium">
                             {comment.text}
                           </p>
-                          
-                          <div className="flex items-center justify-between pt-2 border-t border-white/[0.03]">
-                            <div className="flex items-center gap-4">
-                              <button className="flex items-center gap-1 text-white/20 hover:text-white/40 transition-colors">
-                                <TrendingUp className="w-3 h-3" />
-                                <span className="text-[9px] font-bold">{comment.likes || 0}</span>
+
+                          <div className="flex items-center justify-between pt-3 border-t border-white/[0.05]">
+                            <div className="flex items-center gap-3">
+                              <button className="flex items-center gap-1.5 text-white/30 hover:text-[var(--mp-cyan)] transition-colors text-[10px]">
+                                <Heart className="w-3.5 h-3.5" />
+                                <span className="font-bold">{comment.likes || 0}</span>
                               </button>
-                              <button className="flex items-center gap-1 text-white/20 hover:text-white/40 transition-colors">
-                                <TrendingDown className="w-3 h-3" />
+                              <button className="flex items-center gap-1.5 text-white/30 hover:text-white/50 transition-colors text-[10px]">
+                                <Reply className="w-3.5 h-3.5" />
+                                <span className="font-bold">{language === "Turkish" ? "Yanıtla" : "Reply"}</span>
                               </button>
                             </div>
-                            <div className="flex items-center gap-1.5 opacity-30">
-                              <Globe className="w-2.5 h-2.5" />
-                              <span className="text-[7px] font-black uppercase tracking-wider">Translated</span>
+                            <div className="flex items-center gap-1.5 text-white/20 text-[8px]">
+                              <Globe className="w-3 h-3" />
+                              <span className="font-bold uppercase tracking-wider">{language === "Turkish" ? "Çevrildi" : "Translated"}</span>
                             </div>
                           </div>
                         </div>
@@ -1266,7 +1307,7 @@ export default function MarketPulseApp() {
                 </div>
                 
                 {/* Fixed Comment Input at bottom */}
-                <div className="absolute bottom-0 inset-x-0 p-6 bg-gradient-to-t from-[#0D0E14] via-[#0D0E14] to-transparent">
+                <div className="absolute bottom-24 inset-x-0 p-6 bg-gradient-to-t from-[#0D0E14] via-[#0D0E14] to-transparent z-[130]">
                   <div className="relative">
                     <input 
                       type="text" 
@@ -1285,8 +1326,8 @@ export default function MarketPulseApp() {
         </AnimatePresence>
 
         {/* Bottom Navigation - Redesigned to match image */}
-        <nav className="absolute bottom-0 inset-x-0 z-[140] bg-[#0D0E14]/80 backdrop-blur-2xl border-t border-white/[0.03] px-6 py-6">
-          <div className="flex items-center justify-between max-w-sm mx-auto">
+        <nav className="absolute bottom-0 inset-x-0 z-[140] bg-[#0D0E14]/95 backdrop-blur-2xl border-t border-white/[0.08] px-4 py-3">
+          <div className="flex items-center justify-around max-w-2xl mx-auto">
             {[
               { id: "dashboard", icon: Activity, isLogo: true },
               { id: "watchlist", icon: List },
