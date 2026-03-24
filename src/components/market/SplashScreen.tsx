@@ -11,7 +11,7 @@ interface SplashScreenProps {
 export const SplashScreen = ({ isExitingSplash, isSplashPressed, onSplashClick, t }: SplashScreenProps) => {
   return (
     <div
-      className={`fixed inset-0 z-[400] bg-[var(--mp-bg)] flex flex-col items-center transition-all duration-700 ${
+      className={`absolute inset-0 z-[400] bg-[var(--mp-bg)] flex flex-col items-center transition-all duration-700 ${
         isExitingSplash ? "opacity-0 scale-110" : "opacity-100 scale-100"
       }`}
     >

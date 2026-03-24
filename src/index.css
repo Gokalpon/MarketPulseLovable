@@ -68,6 +68,12 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  .font-price {
+    font-family: 'Space Grotesk', sans-serif;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
   h1, h2, h3 {
     text-wrap: balance;
   }

@@ -15,8 +15,8 @@ export const OnboardingScreen = ({ onLogin, language, setLanguage, t }: Onboardi
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
 
   return (
-    <div className="fixed inset-0 z-[300] bg-[var(--mp-bg)]">
-      <div className="fixed inset-0 z-0 pointer-events-none">
+    <div className="absolute inset-0 z-[300] bg-[var(--mp-bg)]">
+      <div className="absolute inset-0 z-0 pointer-events-none">
         <div
           className="absolute inset-0 opacity-40 blur-[1px]"
           style={{

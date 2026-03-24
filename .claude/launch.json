@@ -3,10 +3,10 @@
   "configurations": [
     {
       "name": "dev-server",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 8081,
-      "autoPort": false
+      "runtimeExecutable": "cmd.exe",
+      "runtimeArgs": ["/c", "npm", "run", "dev", "--", "--port", "8083"],
+      "port": 8083,
+      "autoPort": true
     },
     {
       "name": "test-watch",
